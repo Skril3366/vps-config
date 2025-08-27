@@ -37,7 +37,7 @@ setup:
 # Deploy all services to VPS
 deploy:
     @echo "🚀 Deploying to VPS..."
-    uv run deploy production apply
+    cd ansible && ansible-playbook playbooks/site.yml -i inventories/production.yml
 
 # Deploy all services to VPS with verbose output
 deploy-verbose:
@@ -52,7 +52,7 @@ check:
 # Run Ansible in dry-run mode
 dry-run:
     @echo "🧪 Running Ansible dry-run..."
-    uv run deploy production plan
+    cd ansible && ansible-playbook playbooks/site.yml -i inventories/production.yml --check
 
 # Test VPS connectivity
 ping:
