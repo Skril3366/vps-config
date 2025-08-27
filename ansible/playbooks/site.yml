@@ -6,5 +6,6 @@
     - common
     - security
     - docker
+    - keycloak
     - caddy
     - monitoring

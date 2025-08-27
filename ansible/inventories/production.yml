@@ -15,6 +15,7 @@ all:
     grafana_port: 3000
     prometheus_port: 9090
     loki_port: 3100
+    keycloak_port: 8080
     
     # System configuration
     system_timezone: "UTC"
@@ -32,6 +33,7 @@ all:
     grafana_data_directory: "/opt/grafana/data"
     loki_directory: "/opt/loki"
     promtail_directory: "/opt/promtail"
+    keycloak_data_directory: "/opt/keycloak/data"
 
     # Docker images and versions
     caddy_image: "caddy:2-alpine"
@@ -40,6 +42,7 @@ all:
     grafana_image: "grafana/grafana:latest"
     loki_image: "grafana/loki:latest"
     promtail_image: "grafana/promtail:latest"
+    keycloak_image: "quay.io/keycloak/keycloak:latest"
 
     # Network configuration
     http_port: 80
@@ -60,6 +63,11 @@ all:
     # Monitoring configuration
     prometheus_retention_time: "15d"
     grafana_admin_password: "admin"
+
+    # Keycloak configuration
+    keycloak_admin_user: "admin"
+    keycloak_admin_password: "admin"
+    keycloak_db_password: "keycloak123"
 
     # Essential packages
     essential_packages:

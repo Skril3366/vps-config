@@ -25,6 +25,15 @@ loki.{{ domain_name }} {
     reverse_proxy 127.0.0.1:{{ loki_port }}
 }
 
+# Keycloak authentication
+{% if domain_name != "YOUR_DOMAIN_OR_IP" %}
+auth.{{ domain_name }} {
+{% else %}
+:8081 {
+{% endif %}
+    reverse_proxy 127.0.0.1:{{ keycloak_port }}
+}
+
 # Main domain - redirect to Grafana or serve a landing page
 {% if domain_name != "YOUR_DOMAIN_OR_IP" %}
 {{ domain_name }} {
@@ -52,6 +61,7 @@ loki.{{ domain_name }} {
         <h1>Welcome to {{ domain_name }}</h1>
         <p>Monitoring and observability services:</p>
         <ul class="services">
+            <li><a href="https://auth.{{ domain_name }}">Keycloak - Authentication & Authorization</a></li>
             <li><a href="https://grafana.{{ domain_name }}">Grafana - Dashboards & Visualization</a></li>
             <li><a href="https://prometheus.{{ domain_name }}">Prometheus - Metrics & Monitoring</a></li>
             <li><a href="https://loki.{{ domain_name }}/metrics">Loki - Log Aggregation (Metrics)</a></li>
