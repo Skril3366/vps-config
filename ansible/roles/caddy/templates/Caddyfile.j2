@@ -1,0 +1,36 @@
+# Grafana dashboard
+{% if domain_name != "YOUR_DOMAIN_OR_IP" %}
+grafana.{{ domain_name }} {
+{% else %}
+:3001 {
+{% endif %}
+    reverse_proxy localhost:{{ grafana_port }}
+}
+
+# Prometheus metrics
+{% if domain_name != "YOUR_DOMAIN_OR_IP" %}
+prometheus.{{ domain_name }} {
+{% else %}
+:9091 {
+{% endif %}
+    reverse_proxy localhost:{{ prometheus_port }}
+}
+
+# Loki logs
+{% if domain_name != "YOUR_DOMAIN_OR_IP" %}
+loki.{{ domain_name }} {
+{% else %}
+:3101 {
+{% endif %}
+    reverse_proxy localhost:{{ loki_port }}
+}
+
+# Add your custom services here
+# Example:
+# {% if domain_name != "YOUR_DOMAIN_OR_IP" %}
+# app.{{ domain_name }} {
+# {% else %}
+# :8080 {
+# {% endif %}
+#     reverse_proxy localhost:8000
+# }

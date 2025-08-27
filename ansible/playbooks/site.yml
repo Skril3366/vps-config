@@ -1,0 +1,10 @@
+---
+- name: Configure Personal VPS
+  hosts: vps
+  become: yes
+  roles:
+    - common
+    - security
+    - docker
+    - caddy
+    - monitoring

@@ -1,0 +1,5 @@
+---
+- name: restart caddy
+  docker_container:
+    name: caddy
+    restart: yes

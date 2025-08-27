@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  test-vps:
+    build: .
+    container_name: test-vps
+    hostname: test-vps
+    privileged: true
+    ports:
+      - "2222:22"    # SSH
+      - "8080:80"    # HTTP
+      - "8443:443"   # HTTPS
+      - "3001:3000"  # Grafana
+      - "9091:9090"  # Prometheus
+      - "3101:3100"  # Loki
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    tmpfs:
+      - /run
+      - /tmp
+      - /run/lock
+    networks:
+      - test-net
+
+networks:
+  test-net:
+    driver: bridge
