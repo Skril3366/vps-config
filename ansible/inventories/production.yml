@@ -1,7 +1,7 @@
 all:
   hosts:
     vps:
-      ansible_host: 206.166.251.139
+      ansible_host: 168.100.11.130
       ansible_user: root
       ansible_ssh_private_key_file: ~/.ssh/bitlaunch
       ansible_python_interpreter: /usr/bin/python3.12
@@ -16,7 +16,8 @@ all:
     prometheus_port: 9090
     loki_port: 3100
     keycloak_port: 8080
-    
+    portainer_port: 9000
+
     # System configuration
     system_timezone: "UTC"
     apt_cache_valid_time: 3600
@@ -34,6 +35,7 @@ all:
     loki_directory: "/opt/loki"
     promtail_directory: "/opt/promtail"
     keycloak_data_directory: "/opt/keycloak/data"
+    portainer_data_directory: "/opt/portainer/data"
 
     # Docker images and versions
     caddy_image: "caddy:2-alpine"
@@ -43,6 +45,7 @@ all:
     loki_image: "grafana/loki:latest"
     promtail_image: "grafana/promtail:latest"
     keycloak_image: "quay.io/keycloak/keycloak:latest"
+    portainer_image: "portainer/portainer-ce:latest"
 
     # Network configuration
     http_port: 80
