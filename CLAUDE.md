@@ -9,7 +9,6 @@ This is an Ansible-based VPS configuration project that sets up a personal serve
 - **Docker**: Container runtime for all services  
 - **Monitoring Stack**: Prometheus, Grafana, Loki, Promtail for comprehensive observability
 - **Security**: SSH hardening, firewall rules, fail2ban protection
-- **Keycloak**: Identity and access management (currently disabled due to resource usage)
 - **Portainer**: Docker management UI (placeholder, not yet implemented)
 
 ## Common Commands
@@ -90,7 +89,6 @@ just clean
   - `docker`: Docker engine installation and configuration
   - `caddy`: Reverse proxy setup with automatic HTTPS
   - `monitoring`: Prometheus, Grafana, Loki stack deployment
-  - `keycloak`: Identity and access management (disabled in playbook)
   - `portainer`: Docker management UI (placeholder, not implemented)
 
 ### Configuration Management

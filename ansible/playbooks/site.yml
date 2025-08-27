@@ -6,6 +6,5 @@
     - common
     - security
     - docker
-    # - keycloak  # Temporarily disabled due to high CPU usage
     - caddy
     - monitoring

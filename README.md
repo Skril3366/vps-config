@@ -8,7 +8,6 @@ Simple Ansible-based configuration for a personal VPS with monitoring and revers
 - **Docker**: Container runtime for all services
 - **Monitoring Stack**: Prometheus, Grafana, Loki, Promtail for comprehensive observability
 - **Security**: SSH hardening, firewall rules, and fail2ban protection
-- **Keycloak**: Identity and access management (currently disabled due to resource usage)
 
 ## Repository Structure
 
@@ -20,7 +19,6 @@ Simple Ansible-based configuration for a personal VPS with monitoring and revers
 │   │   ├── docker/     # Docker engine installation and configuration
 │   │   ├── caddy/      # Reverse proxy setup with automatic HTTPS
 │   │   ├── monitoring/ # Prometheus, Grafana, Loki stack deployment
-│   │   ├── keycloak/   # Identity and access management (optional)
 │   │   └── portainer/  # Docker management UI (placeholder)
 │   ├── playbooks/
 │   │   └── site.yml    # Main orchestration playbook
