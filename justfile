@@ -79,6 +79,14 @@ clean:
     @echo "🧹 Cleaning temporary files..."
     find . -name "*.retry" -delete
 
+# Update Caddyfile only
+update-caddy:
+    @echo "🔄 Updating Caddyfile..."
+    @echo "📄 Generating and copying Caddyfile..."
+    cd ansible && ansible vps -i inventories/production.yml -m template -a "src=roles/caddy/templates/Caddyfile.j2 dest=/opt/caddy/Caddyfile mode=0644" --become
+    @echo "🔄 Restarting Caddy container..."
+    cd ansible && ansible vps -i inventories/production.yml -m docker_container -a "name=caddy restart=yes" --become
+
 # SSH to VPS
 ssh:
     @echo "🔐 Connecting to VPS..."
