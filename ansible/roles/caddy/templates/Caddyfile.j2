@@ -4,7 +4,7 @@ grafana.{{ domain_name }} {
 {% else %}
 :3001 {
 {% endif %}
-    reverse_proxy localhost:{{ grafana_port }}
+    reverse_proxy 127.0.0.1:{{ grafana_port }}
 }
 
 # Prometheus metrics
@@ -13,7 +13,7 @@ prometheus.{{ domain_name }} {
 {% else %}
 :9091 {
 {% endif %}
-    reverse_proxy localhost:{{ prometheus_port }}
+    reverse_proxy 127.0.0.1:{{ prometheus_port }}
 }
 
 # Loki logs
@@ -22,7 +22,46 @@ loki.{{ domain_name }} {
 {% else %}
 :3101 {
 {% endif %}
-    reverse_proxy localhost:{{ loki_port }}
+    reverse_proxy 127.0.0.1:{{ loki_port }}
+}
+
+# Main domain - redirect to Grafana or serve a landing page
+{% if domain_name != "YOUR_DOMAIN_OR_IP" %}
+{{ domain_name }} {
+{% else %}
+:80 {
+{% endif %}
+    header Content-Type text/html
+    respond `<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ domain_name }} - Monitoring Services</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        .services { list-style: none; padding: 0; }
+        .services li { margin: 15px 0; }
+        .services a { display: block; padding: 15px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; text-align: center; }
+        .services a:hover { background: #0056b3; }
+        .note { margin-top: 20px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to {{ domain_name }}</h1>
+        <p>Monitoring and observability services:</p>
+        <ul class="services">
+            <li><a href="https://grafana.{{ domain_name }}">Grafana - Dashboards & Visualization</a></li>
+            <li><a href="https://prometheus.{{ domain_name }}">Prometheus - Metrics & Monitoring</a></li>
+            <li><a href="https://loki.{{ domain_name }}/metrics">Loki - Log Aggregation (Metrics)</a></li>
+        </ul>
+        <div class="note">
+            <strong>Services:</strong> All monitoring services are secured with HTTPS and accessible via subdomains.
+        </div>
+    </div>
+</body>
+</html>`
 }
 
 # Add your custom services here

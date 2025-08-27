@@ -22,9 +22,7 @@
     image: "{{ caddy_image }}"
     state: started
     restart_policy: unless-stopped
-    ports:
-      - "{{ http_port }}:80"
-      - "{{ https_port }}:443"
+    network_mode: host
     volumes:
       - "{{ caddy_directory }}/Caddyfile:/etc/caddy/Caddyfile"
       - "{{ caddy_data_directory }}:/data"

@@ -10,6 +10,13 @@
     - "{{ loki_directory }}"
     - "{{ promtail_directory }}"
 
+- name: Set Grafana directory ownership
+  file:
+    path: "{{ grafana_data_directory }}"
+    owner: "472"
+    group: "472"
+    recurse: yes
+
 - name: Generate Prometheus config
   template:
     src: prometheus.yml.j2

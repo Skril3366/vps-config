@@ -39,6 +39,11 @@ deploy:
     @echo "🚀 Deploying to VPS..."
     uv run deploy production apply
 
+# Deploy all services to VPS with verbose output
+deploy-verbose:
+    @echo "🚀 Deploying to VPS (verbose)..."
+    cd ansible && ansible-playbook playbooks/site.yml -i inventories/production.yml -v
+
 # Check Ansible syntax
 check:
     @echo "🔍 Checking Ansible syntax..."

@@ -28,8 +28,8 @@
     update_cache: yes
 
 - name: Install Docker Python module
-  pip:
-    name: docker
+  apt:
+    name: python3-docker
     state: present
 
 - name: Start and enable Docker service
