@@ -1,7 +1,6 @@
 {
-  "dashboard": {
-    "id": null,
-    "title": "Container Logs",
+  "id": null,
+  "title": "Container Logs",
     "tags": ["logs", "loki", "containers"],
     "style": "dark",
     "timezone": "browser",
@@ -12,9 +11,9 @@
         "type": "timeseries",
         "targets": [
           {
-            "expr": "sum by (container) (rate({job=\"docker\"}[1m]))",
+            "expr": "sum by (container) (rate({job=\"docker_files\", filename=~\".*$container.*\"}[1m]))",
             "refId": "A",
-            "datasource": {"type": "loki", "uid": "loki"}
+            "datasource": "Loki"
           }
         ],
         "fieldConfig": {
@@ -30,9 +29,9 @@
         "type": "logs",
         "targets": [
           {
-            "expr": "{job=\"docker\"} |= \"\"",
+            "expr": "{job=\"docker_files\", filename=~\".*$container.*\"} |= \"\"",
             "refId": "A",
-            "datasource": {"type": "loki", "uid": "loki"}
+            "datasource": "Loki"
           }
         ],
         "options": {
@@ -50,9 +49,9 @@
         "type": "logs",
         "targets": [
           {
-            "expr": "{job=\"docker\"} |~ \"(?i)(error|exception|fail|fatal)\"",
+            "expr": "{job=\"docker_files\", filename=~\".*$container.*\"} |~ \"(?i)(error|exception|fail|fatal)\"",
             "refId": "A",
-            "datasource": {"type": "loki", "uid": "loki"}
+            "datasource": "Loki"
           }
         ],
         "options": {
@@ -72,7 +71,7 @@
           {
             "expr": "{job=\"systemd-journal\"}",
             "refId": "A",
-            "datasource": {"type": "loki", "uid": "loki"}
+            "datasource": "Loki"
           }
         ],
         "options": {
@@ -90,9 +89,9 @@
         "type": "piechart",
         "targets": [
           {
-            "expr": "sum by (stream) (count_over_time({job=\"docker\"}[1h]))",
+            "expr": "sum by (stream) (count_over_time({job=\"docker_files\", filename=~\".*$container.*\"}[1h]))",
             "refId": "A",
-            "datasource": {"type": "loki", "uid": "loki"}
+            "datasource": "Loki"
           }
         ],
         "options": {
@@ -110,9 +109,9 @@
         "type": "bargauge",
         "targets": [
           {
-            "expr": "sum by (container) (count_over_time({job=\"docker\"} |~ \"(?i)(error|warn|info|debug)\"[1h]))",
+            "expr": "sum by (container) (count_over_time({job=\"docker_files\", filename=~\".*$container.*\"} |~ \"(?i)(error|warn|info|debug)\"[1h]))",
             "refId": "A",
-            "datasource": {"type": "loki", "uid": "loki"}
+            "datasource": "Loki"
           }
         ],
         "fieldConfig": {
@@ -127,19 +126,35 @@
       "list": [
         {
           "name": "container",
-          "type": "query",
-          "datasource": {"type": "loki", "uid": "loki"},
-          "query": "label_values({job=\"docker\"}, container)",
-          "refresh": 1,
+          "type": "custom",
+          "label": "Container",
           "multi": true,
           "includeAll": true,
-          "allValue": ".*"
+          "allValue": ".*",
+          "hide": 0,
+          "refresh": 0,
+          "query": "grafana : beaf7cde2e18,loki : 8b8849b5fcf8,prometheus : 1f7ad7bc8ce1,promtail : 7d06d3e1d0a6,authelia : 4b80c1611f,authelia_redis : 233b4964bf3a,node_exporter : 946c322fd170,caddy : dd03d900c15f",
+          "options": [
+            {"text": "All", "value": ".*", "selected": true},
+            {"text": "grafana", "value": "beaf7cde2e18", "selected": false},
+            {"text": "loki", "value": "8b8849b5fcf8", "selected": false},
+            {"text": "prometheus", "value": "1f7ad7bc8ce1", "selected": false},
+            {"text": "promtail", "value": "7d06d3e1d0a6", "selected": false},
+            {"text": "authelia", "value": "4b80c1611f", "selected": false},
+            {"text": "authelia_redis", "value": "233b4964bf3a", "selected": false},
+            {"text": "node_exporter", "value": "946c322fd170", "selected": false},
+            {"text": "caddy", "value": "dd03d900c15f", "selected": false}
+          ],
+          "current": {
+            "selected": true,
+            "text": ["All"],
+            "value": [".*"]
+          }
         }
       ]
     },
     "time": {"from": "now-1h", "to": "now"},
     "refresh": "10s",
     "schemaVersion": 30,
-    "version": 1
-  }
+  "version": 1
 }

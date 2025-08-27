@@ -28,6 +28,7 @@ prometheus_image: "prom/prometheus:latest"
 grafana_image: "grafana/grafana:latest"
 loki_image: "grafana/loki:latest"
 promtail_image: "grafana/promtail:latest"
+cadvisor_image: "gcr.io/cadvisor/cadvisor:latest"
 
 # Network configuration
 http_port: 80

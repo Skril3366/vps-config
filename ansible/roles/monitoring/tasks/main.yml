@@ -62,6 +62,7 @@
     src: docker-overview.json.j2
     dest: "{{ grafana_dashboards_directory }}/docker-overview.json"
     mode: '0644'
+  tags: ['grafana_dashboards']
 
 - name: Generate Logs Overview dashboard
   template:
@@ -79,8 +80,10 @@
       - "{{ node_exporter_port }}:9100"
     command:
       - '--path.rootfs=/host'
+      - '--collector.textfile.directory=/textfile'
     volumes:
       - '/:/host:ro,rslave'
+      - '/opt/node_exporter_textfile:/textfile:ro'
 
 - name: Start Prometheus container
   docker_container:
@@ -88,8 +91,7 @@
     image: "{{ prometheus_image }}"
     state: started
     restart_policy: unless-stopped
-    ports:
-      - "{{ prometheus_port }}:9090"
+    network_mode: host
     volumes:
       - "{{ prometheus_directory }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
     command:
@@ -108,8 +110,7 @@
     image: "{{ grafana_image }}"
     state: started
     restart_policy: unless-stopped
-    ports:
-      - "{{ grafana_port }}:3000"
+    network_mode: host
     env:
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
       # Forward authentication configuration
@@ -129,6 +130,7 @@
       - "{{ grafana_data_directory }}:/var/lib/grafana"
       - "{{ grafana_provisioning_directory }}:/etc/grafana/provisioning"
       - "{{ grafana_dashboards_directory }}:/var/lib/grafana/dashboards"
+  tags: ['grafana_restart']
 
 - name: Start Loki container
   docker_container:
@@ -136,8 +138,7 @@
     image: "{{ loki_image }}"
     state: started
     restart_policy: unless-stopped
-    ports:
-      - "{{ loki_port }}:3100"
+    network_mode: host
     volumes:
       - "{{ loki_directory }}/loki.yml:/etc/loki/local-config.yaml"
     command: 
@@ -151,9 +152,65 @@
     image: "{{ promtail_image }}"
     state: started
     restart_policy: unless-stopped
+    network_mode: host
     volumes:
       - "{{ promtail_directory }}/promtail.yml:/etc/promtail/config.yml"
       - /var/log:/var/log:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/config.yml
+
+- name: Start cAdvisor container
+  docker_container:
+    name: cadvisor
+    image: "gcr.io/cadvisor/cadvisor:latest"
+    state: started
+    restart_policy: unless-stopped
+    network_mode: host
+    privileged: yes
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+
+- name: Create textfile directory for node_exporter
+  file:
+    path: /opt/node_exporter_textfile
+    state: directory
+    mode: '0755'
+
+- name: Create Docker status script
+  copy:
+    content: |
+      #!/bin/bash
+      TEXTFILE_DIR="/opt/node_exporter_textfile"
+      TEMP_FILE="$TEXTFILE_DIR/docker_containers.prom.$$"
+      PROM_FILE="$TEXTFILE_DIR/docker_containers.prom"
+      
+      echo "# HELP docker_container_state Container state (1=running, 0=stopped)" > "$TEMP_FILE"
+      echo "# TYPE docker_container_state gauge" >> "$TEMP_FILE"
+      
+      docker ps -a --format "{{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.State{{ '}}' }}" | while IFS=$'\t' read -r name state; do
+        if [ "$state" == "running" ]; then
+          echo "docker_container_state{container_name=\"$name\",state=\"running\"} 1" >> "$TEMP_FILE"
+        else
+          echo "docker_container_state{container_name=\"$name\",state=\"exited\"} 0" >> "$TEMP_FILE"
+        fi
+      done
+      
+      mv "$TEMP_FILE" "$PROM_FILE"
+    dest: /opt/docker-metrics.sh
+    mode: '0755'
+
+- name: Setup Docker metrics cron job
+  cron:
+    name: "Generate Docker metrics"
+    minute: "*"
+    job: "/opt/docker-metrics.sh"
+
+- name: Run Docker metrics script initially
+  command: /opt/docker-metrics.sh

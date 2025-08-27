@@ -1,7 +1,6 @@
 {
-  "dashboard": {
-    "id": null,
-    "title": "System Overview",
+  "id": null,
+  "title": "System Overview",
     "tags": ["system", "node-exporter"],
     "style": "dark",
     "timezone": "browser",
@@ -151,12 +150,12 @@
           {
             "expr": "rate(node_network_receive_bytes_total{device!=\"lo\"}[5m]) * 8",
             "refId": "A",
-            "legendFormat": "Receive {{device}}"
+            "legendFormat": "Receive {{ '{{' }}device{{ '}}' }}"
           },
           {
             "expr": "rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m]) * -8",
             "refId": "B",
-            "legendFormat": "Transmit {{device}}"
+            "legendFormat": "Transmit {{ '{{' }}device{{ '}}' }}"
           }
         ],
         "fieldConfig": {
@@ -170,6 +169,5 @@
     "time": {"from": "now-1h", "to": "now"},
     "refresh": "5s",
     "schemaVersion": 30,
-    "version": 1
-  }
+  "version": 1
 }

@@ -6,7 +6,7 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://localhost:{{ loki_port }}/loki/api/v1/push
+  - url: http://127.0.0.1:{{ loki_port }}/loki/api/v1/push
 
 scrape_configs:
   - job_name: system
