@@ -1,0 +1,145 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Container Logs",
+    "tags": ["logs", "loki", "containers"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Log Rate by Container",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum by (container) (rate({job=\"docker\"}[1m]))",
+            "refId": "A",
+            "datasource": {"type": "loki", "uid": "loki"}
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "logs/sec"
+          }
+        },
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Recent Container Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"docker\"} |= \"\"",
+            "refId": "A",
+            "datasource": {"type": "loki", "uid": "loki"}
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        },
+        "gridPos": {"h": 12, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "id": 3,
+        "title": "Error Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"docker\"} |~ \"(?i)(error|exception|fail|fatal)\"",
+            "refId": "A",
+            "datasource": {"type": "loki", "uid": "loki"}
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+      },
+      {
+        "id": 4,
+        "title": "System Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"systemd-journal\"}",
+            "refId": "A",
+            "datasource": {"type": "loki", "uid": "loki"}
+          }
+        ],
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending"
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+      },
+      {
+        "id": 5,
+        "title": "Log Volume by Stream",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (stream) (count_over_time({job=\"docker\"}[1h]))",
+            "refId": "A",
+            "datasource": {"type": "loki", "uid": "loki"}
+          }
+        ],
+        "options": {
+          "legend": {
+            "displayMode": "table",
+            "placement": "right",
+            "values": ["value", "percent"]
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28}
+      },
+      {
+        "id": 6,
+        "title": "Container Log Levels",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "sum by (container) (count_over_time({job=\"docker\"} |~ \"(?i)(error|warn|info|debug)\"[1h]))",
+            "refId": "A",
+            "datasource": {"type": "loki", "uid": "loki"}
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "logs"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28}
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "container",
+          "type": "query",
+          "datasource": {"type": "loki", "uid": "loki"},
+          "query": "label_values({job=\"docker\"}, container)",
+          "refresh": 1,
+          "multi": true,
+          "includeAll": true,
+          "allValue": ".*"
+        }
+      ]
+    },
+    "time": {"from": "now-1h", "to": "now"},
+    "refresh": "10s",
+    "schemaVersion": 30,
+    "version": 1
+  }
+}

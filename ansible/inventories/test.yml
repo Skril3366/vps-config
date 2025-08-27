@@ -30,6 +30,8 @@ all:
     caddy_data_directory: "/opt/caddy/data"
     prometheus_directory: "/opt/prometheus"
     grafana_data_directory: "/opt/grafana/data"
+    grafana_provisioning_directory: "/opt/grafana/provisioning"
+    grafana_dashboards_directory: "/opt/grafana/dashboards"
     loki_directory: "/opt/loki"
     promtail_directory: "/opt/promtail"
 

@@ -7,6 +7,10 @@
   loop:
     - "{{ prometheus_directory }}"
     - "{{ grafana_data_directory }}"
+    - "{{ grafana_provisioning_directory }}"
+    - "{{ grafana_provisioning_directory }}/datasources"
+    - "{{ grafana_provisioning_directory }}/dashboards"
+    - "{{ grafana_dashboards_directory }}"
     - "{{ loki_directory }}"
     - "{{ promtail_directory }}"
 
@@ -33,6 +37,36 @@
   template:
     src: promtail.yml.j2
     dest: "{{ promtail_directory }}/promtail.yml"
+    mode: '0644'
+
+- name: Generate Grafana datasources config
+  template:
+    src: datasources.yml.j2
+    dest: "{{ grafana_provisioning_directory }}/datasources/datasources.yml"
+    mode: '0644'
+
+- name: Generate Grafana dashboards config
+  template:
+    src: dashboards.yml.j2
+    dest: "{{ grafana_provisioning_directory }}/dashboards/dashboards.yml"
+    mode: '0644'
+
+- name: Generate System Overview dashboard
+  template:
+    src: system-overview.json.j2
+    dest: "{{ grafana_dashboards_directory }}/system-overview.json"
+    mode: '0644'
+
+- name: Generate Docker Overview dashboard
+  template:
+    src: docker-overview.json.j2
+    dest: "{{ grafana_dashboards_directory }}/docker-overview.json"
+    mode: '0644'
+
+- name: Generate Logs Overview dashboard
+  template:
+    src: logs-overview.json.j2
+    dest: "{{ grafana_dashboards_directory }}/logs-overview.json"
     mode: '0644'
 
 - name: Start Node Exporter container
@@ -93,6 +127,8 @@
       GF_USERS_AUTO_ASSIGN_ORG_ROLE: "Admin"
     volumes:
       - "{{ grafana_data_directory }}:/var/lib/grafana"
+      - "{{ grafana_provisioning_directory }}:/etc/grafana/provisioning"
+      - "{{ grafana_dashboards_directory }}:/var/lib/grafana/dashboards"
 
 - name: Start Loki container
   docker_container:
@@ -119,4 +155,5 @@
       - "{{ promtail_directory }}/promtail.yml:/etc/promtail/config.yml"
       - /var/log:/var/log:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/config.yml
