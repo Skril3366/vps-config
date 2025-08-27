@@ -64,6 +64,15 @@ all:
     prometheus_retention_time: "15d"
     grafana_admin_password: "admin"
 
+    # Authelia configuration (non-sensitive settings only)
+    authelia_image: "authelia/authelia:latest"
+    authelia_port: 9091
+    authelia_directory: "/opt/authelia"
+    authelia_config_directory: "/opt/authelia/config"
+    authelia_data_directory: "/opt/authelia/data"
+    authelia_domain: "auth.{{ domain_name }}"
+    session_domain: "{{ domain_name }}"
+
     # Essential packages
     essential_packages:
       - curl

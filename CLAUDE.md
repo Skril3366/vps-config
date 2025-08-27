@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is an Ansible-based VPS configuration project that sets up a personal server with:
 - **Caddy**: Reverse proxy with automatic HTTPS
 - **Docker**: Container runtime for all services  
+- **Authelia**: Authentication and authorization service with 2FA support
 - **Monitoring Stack**: Prometheus, Grafana, Loki, Promtail for comprehensive observability
 - **Security**: SSH hardening, firewall rules, fail2ban protection
 - **Portainer**: Docker management UI (placeholder, not yet implemented)
@@ -88,6 +89,7 @@ just clean
   - `security`: SSH hardening, firewall rules, fail2ban
   - `docker`: Docker engine installation and configuration
   - `caddy`: Reverse proxy setup with automatic HTTPS
+  - `authelia`: Authentication service with 2FA and Redis session storage
   - `monitoring`: Prometheus, Grafana, Loki stack deployment
   - `portainer`: Docker management UI (placeholder, not implemented)
 
@@ -109,6 +111,11 @@ just clean
 - `ansible/inventories/production.yml`: Your VPS IP, SSH settings, domain name
 - `ansible/group_vars/all.yml`: Global variables and service configuration
 - `ansible/roles/caddy/templates/Caddyfile.j2`: Add reverse proxy rules for your applications
+
+### For Authentication Configuration
+- `ansible/inventories/production/.env`: Authelia secrets and configuration (create from `.env.example`)
+- `ansible/roles/authelia/templates/configuration.yml.j2`: Authelia main configuration
+- `ansible/roles/authelia/templates/users_database.yml.j2`: User accounts and groups
 
 ### For Service Configuration
 - `ansible/roles/monitoring/templates/prometheus.yml.j2`: Prometheus scrape targets and configuration
@@ -145,18 +152,22 @@ All scripts provide colored output, detailed error reporting, and can be run via
 
 After deployment, services are available at:
 
-**Direct access** (using server IP and default ports from group_vars):
-- **Grafana**: Port 3000 (default admin/admin - change on first login)
-- **Prometheus**: Port 9090  
-- **Loki**: Port 3100
-- **Node Exporter**: Port 9100
+**Authentication Portal**:
+- **Authelia**: `https://auth.yourdomain.com` (Port 9091)
 
-**Domain access** (via Caddy reverse proxy):
-URLs depend on your domain configuration in the Caddy template:
-- `https://grafana.yourdomain.com`
-- `https://prometheus.yourdomain.com`
-- `https://loki.yourdomain.com`
+**Protected Services** (require authentication via Authelia):
+- **Grafana**: `https://grafana.yourdomain.com` (Port 3000)
+- **Prometheus**: `https://prometheus.yourdomain.com` (Port 9090)
+- **Loki**: `https://loki.yourdomain.com` (Port 3100)
+
+**Monitoring Services**:
+- **Node Exporter**: Port 9100 (direct access)
+
+**Direct access** (bypasses authentication, using server IP):
+- Available on configured ports for troubleshooting
+- Not recommended for production use
 
 **Configuration locations:**
 - Port configurations: `ansible/group_vars/all.yml`
 - Domain configurations: `ansible/roles/caddy/templates/Caddyfile.j2`
+- Authentication settings: `ansible/inventories/production/.env`

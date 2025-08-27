@@ -64,6 +64,9 @@
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time={{ prometheus_retention_time }}'
+      # Enable external URL and route prefix for reverse proxy
+      - '--web.external-url=https://prometheus.{{ domain_name }}'
+      - '--web.route-prefix=/'
 
 - name: Start Grafana container
   docker_container:
@@ -75,6 +78,19 @@
       - "{{ grafana_port }}:3000"
     env:
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
+      # Forward authentication configuration
+      GF_AUTH_PROXY_ENABLED: "true"
+      GF_AUTH_PROXY_HEADER_NAME: "Remote-User"
+      GF_AUTH_PROXY_HEADER_PROPERTY: "username"
+      GF_AUTH_PROXY_AUTO_SIGN_UP: "true"
+      GF_AUTH_PROXY_ENABLE_LOGIN_TOKEN: "false"
+      # Additional user info headers
+      GF_AUTH_PROXY_HEADERS: "Name:Remote-Name Email:Remote-Email Groups:Remote-Groups"
+      # Security settings
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_AUTO_ASSIGN_ORG: "true"
+      GF_USERS_AUTO_ASSIGN_ORG_ID: "1"
+      GF_USERS_AUTO_ASSIGN_ORG_ROLE: "Admin"
     volumes:
       - "{{ grafana_data_directory }}:/var/lib/grafana"
 
@@ -88,7 +104,10 @@
       - "{{ loki_port }}:3100"
     volumes:
       - "{{ loki_directory }}/loki.yml:/etc/loki/local-config.yaml"
-    command: -config.file=/etc/loki/local-config.yaml
+    command: 
+      - -config.file=/etc/loki/local-config.yaml
+      # Configure for reverse proxy
+      - -server.path-prefix=/
 
 - name: Start Promtail container
   docker_container:

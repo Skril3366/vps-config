@@ -1,0 +1,5 @@
+---
+- name: restart authelia
+  shell: |
+    cd {{ authelia_directory }}
+    docker compose restart authelia

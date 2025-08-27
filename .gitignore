@@ -25,6 +25,8 @@ id_ed25519*
 .env
 .env.local
 .env.*.local
+ansible/inventories/.env
+ansible/inventories/production/.env
 
 # Logs
 logs/

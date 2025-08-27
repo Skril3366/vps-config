@@ -1,0 +1,55 @@
+---
+- name: Create Authelia directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - "{{ authelia_directory }}"
+    - "{{ authelia_config_directory }}"
+    - "{{ authelia_data_directory }}"
+
+- name: Generate Authelia configuration
+  template:
+    src: configuration.yml.j2
+    dest: "{{ authelia_config_directory }}/configuration.yml"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart authelia
+
+- name: Generate Authelia users database
+  template:
+    src: users_database.yml.j2
+    dest: "{{ authelia_config_directory }}/users_database.yml"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart authelia
+
+- name: Generate Authelia environment file
+  template:
+    src: .env.j2
+    dest: "{{ authelia_directory }}/.env"
+    owner: root
+    group: root
+    mode: '0600'
+  notify: restart authelia
+
+- name: Create Authelia Docker Compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ authelia_directory }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart authelia
+
+- name: Start Authelia service
+  shell: |
+    cd {{ authelia_directory }}
+    docker compose up -d
+  register: authelia_result
+  changed_when: "'Started' in authelia_result.stderr or 'Created' in authelia_result.stderr"

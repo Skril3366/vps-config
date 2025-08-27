@@ -3,8 +3,9 @@
   hosts: vps
   become: yes
   roles:
-    - common
-    - security
-    - docker
-    - caddy
-    - monitoring
+    - { role: common, tags: ['common'] }
+    - { role: security, tags: ['security'] }
+    - { role: docker, tags: ['docker'] }
+    - { role: authelia, tags: ['authelia'] }
+    - { role: caddy, tags: ['caddy'] }
+    - { role: monitoring, tags: ['monitoring'] }

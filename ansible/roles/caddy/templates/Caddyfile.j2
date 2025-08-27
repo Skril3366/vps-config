@@ -1,9 +1,22 @@
+# Authelia authentication portal
+{% if domain_name != "YOUR_DOMAIN_OR_IP" %}
+auth.{{ domain_name }} {
+{% else %}
+:9092 {
+{% endif %}
+    reverse_proxy 127.0.0.1:{{ authelia_port }}
+}
+
 # Grafana dashboard
 {% if domain_name != "YOUR_DOMAIN_OR_IP" %}
 grafana.{{ domain_name }} {
 {% else %}
 :3001 {
 {% endif %}
+    forward_auth 127.0.0.1:{{ authelia_port }} {
+        uri /api/verify?rd=https://auth.{{ domain_name }}
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
     reverse_proxy 127.0.0.1:{{ grafana_port }}
 }
 
@@ -13,6 +26,10 @@ prometheus.{{ domain_name }} {
 {% else %}
 :9091 {
 {% endif %}
+    forward_auth 127.0.0.1:{{ authelia_port }} {
+        uri /api/verify?rd=https://auth.{{ domain_name }}
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
     reverse_proxy 127.0.0.1:{{ prometheus_port }}
 }
 
@@ -22,6 +39,10 @@ loki.{{ domain_name }} {
 {% else %}
 :3101 {
 {% endif %}
+    forward_auth 127.0.0.1:{{ authelia_port }} {
+        uri /api/verify?rd=https://auth.{{ domain_name }}
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
     reverse_proxy 127.0.0.1:{{ loki_port }}
 }
 
@@ -52,6 +73,7 @@ loki.{{ domain_name }} {
         <h1>Welcome to {{ domain_name }}</h1>
         <p>Monitoring and observability services:</p>
         <ul class="services">
+            <li><a href="https://auth.{{ domain_name }}">Authelia - Authentication Portal</a></li>
             <li><a href="https://grafana.{{ domain_name }}">Grafana - Dashboards & Visualization</a></li>
             <li><a href="https://prometheus.{{ domain_name }}">Prometheus - Metrics & Monitoring</a></li>
             <li><a href="https://loki.{{ domain_name }}/metrics">Loki - Log Aggregation (Metrics)</a></li>

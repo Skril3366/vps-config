@@ -87,7 +87,23 @@ update-caddy:
     @echo "🔄 Restarting Caddy container..."
     cd ansible && ansible vps -i inventories/production.yml -m docker_container -a "name=caddy restart=yes" --become
 
+# Deploy Authelia only
+deploy-authelia:
+    @echo "🔒 Deploying Authelia..."
+    cd ansible && ansible-playbook playbooks/site.yml -i inventories/production.yml --tags authelia
+
+# Reset Authelia user bans and regulation
+reset-authelia-bans:
+    @echo "🔓 Resetting Authelia bans..."
+    cd ansible && ansible vps -i inventories/production.yml -m shell -a "docker exec authelia rm -f /data/db.sqlite3"
+    @echo "🔄 Restarting Authelia..."
+    cd ansible && ansible vps -i inventories/production.yml -m shell -a "docker restart authelia"
+    @echo "✅ Authelia bans cleared and service restarted"
+
 # SSH to VPS
 ssh:
     @echo "🔐 Connecting to VPS..."
     cd ansible && ansible vps -i inventories/production.yml -m shell -a "uptime"
+
+@authelia-hash password:
+  docker run --rm authelia/authelia:latest authelia crypto hash generate --password '{{password}}'

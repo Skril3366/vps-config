@@ -20,6 +20,7 @@ promtail_directory: "/opt/promtail"
 
 # Docker images and versions
 caddy_image: "caddy:2-alpine"
+authelia_image: "authelia/authelia:latest"
 node_exporter_image: "prom/node-exporter:latest"
 prometheus_image: "prom/prometheus:latest"
 grafana_image: "grafana/grafana:latest"
@@ -32,6 +33,7 @@ https_port: 443
 node_exporter_port: 9100
 
 # Service ports (can be overridden in inventory)
+authelia_port: 9091
 grafana_port: 3000
 prometheus_port: 9090
 loki_port: 3100
@@ -50,6 +52,13 @@ automatic_reboot: false
 # Monitoring configuration
 prometheus_retention_time: "15d"
 grafana_admin_password: "admin"
+
+# Authelia configuration (non-secret variables)
+authelia_domain: "auth.{{ domain_name }}"
+session_domain: "{{ domain_name }}"
+authelia_directory: "/opt/authelia"
+authelia_config_directory: "/opt/authelia/config"
+authelia_data_directory: "/opt/authelia/data"
 
 # Essential packages
 essential_packages:
