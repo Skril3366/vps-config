@@ -37,7 +37,7 @@ setup:
 # Deploy all services to VPS
 deploy:
     @echo "🚀 Deploying to VPS..."
-    cd ansible && ansible-playbook playbooks/site.yml -i inventories/production.yml
+    uv run deploy production apply
 
 # Check Ansible syntax
 check:
@@ -47,7 +47,7 @@ check:
 # Run Ansible in dry-run mode
 dry-run:
     @echo "🧪 Running Ansible dry-run..."
-    cd ansible && ansible-playbook playbooks/site.yml --check -i inventories/production.yml
+    uv run deploy production plan
 
 # Test VPS connectivity
 ping:
@@ -57,7 +57,7 @@ ping:
 # Run health checks
 health-check:
     @echo "🔍 Running health checks..."
-    cd ansible && ansible vps -i inventories/production.yml -m shell -a "docker ps"
+    uv run health-check production
 
 # Restart specific service
 restart service:

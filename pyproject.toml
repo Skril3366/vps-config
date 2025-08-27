@@ -14,6 +14,8 @@ dependencies = [
 [project.scripts]
 test-local = "scripts.test_local:main"
 validate = "scripts.validate:main"
+deploy = "scripts.deployment.deploy:main"
+health-check = "scripts.utilities.health_check:main"
 
 [build-system]
 requires = ["hatchling"]

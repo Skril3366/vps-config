@@ -42,12 +42,15 @@ just setup
 
 # Check Ansible syntax
 just check
+# or: uv run deploy production check
 
 # Test deployment without making changes
 just dry-run
+# or: uv run deploy production plan
 
 # Deploy to VPS
 just deploy
+# or: uv run deploy production apply
 ```
 
 ### Management Commands
@@ -57,6 +60,7 @@ just ping
 
 # Check running containers on VPS
 just health-check
+# or: uv run health-check production
 
 # Restart specific service (e.g., grafana, prometheus)
 just restart grafana
@@ -108,9 +112,18 @@ The local testing environment uses Docker to simulate the target VPS environment
 
 ## Python Scripts
 
+All scripts are written in Python and use the uv package manager for dependency management:
+
 - `scripts/validate.py`: Pre-deployment validation (syntax, prerequisites, Docker images)
-- `scripts/test_local.py`: Local Docker-based testing with full deployment simulation
-- Both scripts provide colored output and detailed error reporting
+- `scripts/test_local.py`: Local Docker-based testing with full deployment simulation  
+- `scripts/deployment/deploy.py`: Ansible deployment wrapper with syntax checking, dry-run, and deployment
+- `scripts/utilities/health_check.py`: Infrastructure health checks for connectivity, resources, services, and monitoring endpoints
+
+All scripts provide colored output, detailed error reporting, and can be run via uv entry points:
+- `uv run validate` - Run validation tests
+- `uv run test-local` - Run local testing
+- `uv run deploy <environment> <action>` - Deploy with Ansible (actions: check, plan, apply, cleanup)
+- `uv run health-check <environment>` - Run health checks
 
 ## Service Access
 
