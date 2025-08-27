@@ -8,12 +8,14 @@
   apt:
     name: fail2ban
     state: present
+  when: fail2ban_enabled
 
 - name: Start and enable fail2ban
   systemd:
     name: fail2ban
     state: started
     enabled: yes
+  when: fail2ban_enabled
 
 - name: Configure SSH security
   lineinfile:
@@ -22,16 +24,17 @@
     line: "{{ item.line }}"
     backup: yes
   loop:
-    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin yes' }
-    - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
-    - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
-    - { regexp: '^#?Port', line: 'Port 22' }
+    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin {{ ssh_permit_root_login }}' }
+    - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication {{ ssh_password_authentication }}' }
+    - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication {{ ssh_pubkey_authentication }}' }
+    - { regexp: '^#?Port', line: 'Port {{ ssh_port }}' }
   notify: restart ssh
 
 - name: Set up automatic security updates
   apt:
     name: unattended-upgrades
     state: present
+  when: unattended_upgrades_enabled
 
 - name: Configure automatic security updates
   copy:
@@ -44,5 +47,6 @@
       Unattended-Upgrade::AutoFixInterruptedDpkg "true";
       Unattended-Upgrade::MinimalSteps "true";
       Unattended-Upgrade::Remove-Unused-Dependencies "true";
-      Unattended-Upgrade::Automatic-Reboot "false";
+      Unattended-Upgrade::Automatic-Reboot "{{ automatic_reboot | lower }}";
     dest: /etc/apt/apt.conf.d/50unattended-upgrades
+  when: unattended_upgrades_enabled

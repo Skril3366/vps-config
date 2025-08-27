@@ -23,11 +23,7 @@
 
 - name: Install Docker
   apt:
-    name:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - docker-compose-plugin
+    name: "{{ docker_packages }}"
     state: present
     update_cache: yes
 

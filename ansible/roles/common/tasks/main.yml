@@ -2,25 +2,15 @@
 - name: Update apt cache
   apt:
     update_cache: yes
-    cache_valid_time: 3600
+    cache_valid_time: "{{ apt_cache_valid_time }}"
 
 - name: Install essential packages
   apt:
-    name:
-      - curl
-      - wget
-      - git
-      - htop
-      - unzip
-      - software-properties-common
-      - apt-transport-https
-      - ca-certificates
-      - gnupg
-      - lsb-release
+    name: "{{ essential_packages }}"
     state: present
 
-- name: Set timezone to UTC
-  shell: timedatectl set-timezone UTC
+- name: Set timezone
+  shell: timedatectl set-timezone "{{ system_timezone }}"
   changed_when: false
   failed_when: false
 
@@ -30,5 +20,5 @@
     state: directory
     mode: '0755'
   loop:
-    - /opt
-    - /opt/logs
+    - "{{ base_directory }}"
+    - "{{ logs_directory }}"

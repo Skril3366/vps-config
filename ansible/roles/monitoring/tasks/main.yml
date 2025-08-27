@@ -5,37 +5,37 @@
     state: directory
     mode: '0755'
   loop:
-    - /opt/prometheus
-    - /opt/grafana/data
-    - /opt/loki
-    - /opt/promtail
+    - "{{ prometheus_directory }}"
+    - "{{ grafana_data_directory }}"
+    - "{{ loki_directory }}"
+    - "{{ promtail_directory }}"
 
 - name: Generate Prometheus config
   template:
     src: prometheus.yml.j2
-    dest: /opt/prometheus/prometheus.yml
+    dest: "{{ prometheus_directory }}/prometheus.yml"
     mode: '0644'
 
 - name: Generate Loki config
   template:
     src: loki.yml.j2
-    dest: /opt/loki/loki.yml
+    dest: "{{ loki_directory }}/loki.yml"
     mode: '0644'
 
 - name: Generate Promtail config
   template:
     src: promtail.yml.j2
-    dest: /opt/promtail/promtail.yml
+    dest: "{{ promtail_directory }}/promtail.yml"
     mode: '0644'
 
 - name: Start Node Exporter container
   docker_container:
     name: node_exporter
-    image: prom/node-exporter:latest
+    image: "{{ node_exporter_image }}"
     state: started
     restart_policy: unless-stopped
     ports:
-      - "9100:9100"
+      - "{{ node_exporter_port }}:9100"
     command:
       - '--path.rootfs=/host'
     volumes:
@@ -44,53 +44,53 @@
 - name: Start Prometheus container
   docker_container:
     name: prometheus
-    image: prom/prometheus:latest
+    image: "{{ prometheus_image }}"
     state: started
     restart_policy: unless-stopped
     ports:
       - "{{ prometheus_port }}:9090"
     volumes:
-      - /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - "{{ prometheus_directory }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=15d'
+      - '--storage.tsdb.retention.time={{ prometheus_retention_time }}'
 
 - name: Start Grafana container
   docker_container:
     name: grafana
-    image: grafana/grafana:latest
+    image: "{{ grafana_image }}"
     state: started
     restart_policy: unless-stopped
     ports:
       - "{{ grafana_port }}:3000"
     env:
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
     volumes:
-      - /opt/grafana/data:/var/lib/grafana
+      - "{{ grafana_data_directory }}:/var/lib/grafana"
 
 - name: Start Loki container
   docker_container:
     name: loki
-    image: grafana/loki:latest
+    image: "{{ loki_image }}"
     state: started
     restart_policy: unless-stopped
     ports:
       - "{{ loki_port }}:3100"
     volumes:
-      - /opt/loki/loki.yml:/etc/loki/local-config.yaml
+      - "{{ loki_directory }}/loki.yml:/etc/loki/local-config.yaml"
     command: -config.file=/etc/loki/local-config.yaml
 
 - name: Start Promtail container
   docker_container:
     name: promtail
-    image: grafana/promtail:latest
+    image: "{{ promtail_image }}"
     state: started
     restart_policy: unless-stopped
     volumes:
-      - /opt/promtail/promtail.yml:/etc/promtail/config.yml
+      - "{{ promtail_directory }}/promtail.yml:/etc/promtail/config.yml"
       - /var/log:/var/log:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
     command: -config.file=/etc/promtail/config.yml
