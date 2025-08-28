@@ -14,24 +14,24 @@ The VPS setup follows a containerized, reverse-proxy architecture with centraliz
 ┌─────────────────────────────▼───────────────────────────────────────┐
 │                        Caddy Reverse Proxy                          │
 │                    (Automatic HTTPS/Let's Encrypt)                  │
-└─────────────┬─────────────┬─────────────┬─────────────┬─────────────┘
-              │             │             │             │
-              ▼             ▼             ▼             ▼
-┌─────────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-│    Authelia     │ │   Grafana    │ │  Prometheus  │ │     Loki     │
-│  (Port 9091)    │ │ (Port 3000)  │ │ (Port 9090)  │ │ (Port 3100)  │
-│                 │ │              │ │              │ │              │
-│ Authentication  │ │  Dashboards  │ │   Metrics    │ │     Logs     │
-│ & Authorization │ │ & Visualization│ │  Collection  │ │  Aggregation │
-└─────────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
-          │                                   ▲             ▲
-          ▼                                   │             │
-┌─────────────────┐                 ┌──────────────┐ ┌──────────────┐
-│   Redis Cache   │                 │ Node Exporter│ │   Promtail   │
-│ (Port 6379)     │                 │ (Port 9100)  │ │ (Port 9080)  │
-│                 │                 │              │ │              │
-│ Session Storage │                 │System Metrics│ │Log Collection│
-└─────────────────┘                 └──────────────┘ └──────────────┘
+└─────────────┬─────────────┬────────────────┬────────────────┬───────┘
+              │             │                │                │
+              ▼             ▼                ▼                ▼
+┌─────────────────┐ ┌───────────────┐ ┌──────────────┐ ┌──────────────┐
+│    Authelia     │ │   Grafana     │ │  Prometheus  │ │     Loki     │
+│  (Port 9091)    │ │ (Port 3000)   │ │ (Port 9090)  │ │ (Port 3100)  │
+│                 │ │               │ │              │ │              │
+│ Authentication  │ │  Dashboards   │ │   Metrics    │ │     Logs     │
+│ & Authorization │ │& Visualization│ │  Collection  │ │  Aggregation │
+└─────────────────┘ └───────────────┘ └──────────────┘ └──────────────┘
+          │                                   ▲                ▲
+          ▼                                   │                │
+┌─────────────────┐                   ┌──────────────┐ ┌──────────────┐
+│   Redis Cache   │                   │ Node Exporter│ │   Promtail   │
+│ (Port 6379)     │                   │ (Port 9100)  │ │ (Port 9080)  │
+│                 │                   │              │ │              │
+│ Session Storage │                   │System Metrics│ │Log Collection│
+└─────────────────┘                   └──────────────┘ └──────────────┘
 ```
 
 ## Component Architecture
@@ -224,7 +224,7 @@ External (Internet):
 
 Internal (Docker):
 ├── 9091/tcp → Authelia
-├── 3000/tcp → Grafana  
+├── 3000/tcp → Grafana
 ├── 9090/tcp → Prometheus
 ├── 3100/tcp → Loki
 ├── 9100/tcp → Node Exporter
@@ -267,7 +267,7 @@ Internal (Docker):
 
 ### Monitoring and Alerting
 - Security event logging
-- Failed authentication tracking  
+- Failed authentication tracking
 - System resource monitoring
 - Service health monitoring
 
