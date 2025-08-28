@@ -16,6 +16,7 @@ all:
     prometheus_port: 9090
     loki_port: 3100
     portainer_port: 9000
+    personal_website_port: 8002
 
     # System configuration
     system_timezone: "UTC"

@@ -1,0 +1,11 @@
+---
+# Personal website container is managed by CI/CD
+# This role only ensures the proxy configuration is set up
+# The CI job handles: docker run -d --name personal-website --restart unless-stopped -p 8002:80 personal-website:latest
+
+- name: Ensure personal website port is available in firewall
+  ufw:
+    rule: allow
+    port: "{{ personal_website_port }}"
+    proto: tcp
+  when: ansible_facts['os_family'] == "Debian"

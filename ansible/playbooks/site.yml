@@ -8,5 +8,6 @@
     - { role: docker, tags: ['docker'] }
     - { role: authelia, tags: ['authelia'] }
     - { role: projects, tags: ['projects'] }
+    - { role: personal-website, tags: ['personal-website'] }
     - { role: caddy, tags: ['caddy'] }
     - { role: monitoring, tags: ['monitoring'] }
