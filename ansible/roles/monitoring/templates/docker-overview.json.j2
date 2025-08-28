@@ -65,14 +65,9 @@
         "type": "timeseries",
         "targets": [
           {
-            "expr": "rate(container_network_receive_bytes_total{name!=\"\"}[5m])",
+            "expr": "sum by (name) (rate(container_network_receive_bytes_total{name!=\"\"}[5m]) + rate(container_network_transmit_bytes_total{name!=\"\"}[5m]))",
             "refId": "A",
-            "legendFormat": "{{ '{{' }}name{{ '}}' }} - Receive"
-          },
-          {
-            "expr": "rate(container_network_transmit_bytes_total{name!=\"\"}[5m])",
-            "refId": "B",
-            "legendFormat": "{{ '{{' }}name{{ '}}' }} - Transmit"
+            "legendFormat": "{{ '{{' }}name{{ '}}' }}"
           }
         ],
         "fieldConfig": {

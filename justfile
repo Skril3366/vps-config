@@ -92,6 +92,11 @@ deploy-authelia:
     @echo "🔒 Deploying Authelia..."
     cd ansible && ansible-playbook playbooks/site.yml -i inventories/production.yml --tags authelia
 
+# Deploy Grafana only
+deploy-grafana:
+    @echo "📊 Deploying Grafana..."
+    cd ansible && ansible-playbook playbooks/site.yml -i inventories/production.yml --tags grafana
+
 # Reset Authelia user bans and regulation
 reset-authelia-bans:
     @echo "🔓 Resetting Authelia bans..."
