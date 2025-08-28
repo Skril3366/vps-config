@@ -111,4 +111,3 @@ all:
         type: static
         port: 8001
         auth_required: false
-        subdomain: "infinite-echoes"  # Use dedicated subdomain

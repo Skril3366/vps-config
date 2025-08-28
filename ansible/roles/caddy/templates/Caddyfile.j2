@@ -62,13 +62,13 @@ projects.{{ domain_name }} {
 :8080 {
 {% endif %}
 {% for project in projects %}
+    # Redirect project path without trailing slash to add trailing slash
+    redir /{{ project.name }} /{{ project.name }}/ permanent
+    
     # Handle main app page
     handle /{{ project.name }}/* {
         uri strip_prefix /{{ project.name }}
         reverse_proxy 127.0.0.1:{{ project.port }}
-    }
-    handle /{{ project.name }} {
-        redir /{{ project.name }}/ permanent
     }
     
     # Handle any absolute paths from {{ project.name }} (based on referer)
