@@ -22,3 +22,34 @@
   loop:
     - "{{ base_directory }}"
     - "{{ logs_directory }}"
+
+- name: Create deployment user
+  user:
+    name: "{{ deployment_user }}"
+    shell: /bin/bash
+    create_home: yes
+    groups: docker
+    append: yes
+
+- name: Setup SSH directory for deployment user
+  file:
+    path: "/home/{{ deployment_user }}/.ssh"
+    state: directory
+    owner: "{{ deployment_user }}"
+    group: "{{ deployment_user }}"
+    mode: '0700'
+
+- name: Add SSH public key for deployment user
+  authorized_key:
+    user: "{{ deployment_user }}"
+    key: "{{ deployment_user_ssh_key }}"
+    state: present
+  when: deployment_user_ssh_key != ""
+
+- name: Configure limited sudo access for deployment user
+  copy:
+    content: |
+      {{ deployment_user }} ALL=(ALL) NOPASSWD: /usr/bin/docker
+    dest: "/etc/sudoers.d/{{ deployment_user }}"
+    mode: '0440'
+    validate: 'visudo -cf %s'

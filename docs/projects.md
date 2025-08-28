@@ -291,6 +291,90 @@ Projects automatically get:
 - Fail2ban protection against brute force attacks
 - Regular security updates via unattended-upgrades
 
+## Subpath Configuration
+
+### Understanding Subpath Issues
+
+When serving applications under subpaths (like `projects.domain.com/infinite-echoes`), you may encounter asset loading issues if your application uses absolute paths in HTML/JavaScript.
+
+#### Common Problem
+Your HTML contains absolute paths:
+```html
+<link rel="stylesheet" href="/style.css">
+<script src="/game.js"></script>
+```
+
+When served under `/infinite-echoes/`, the browser requests:
+- `/style.css` ❌ (404 - file not found at root)
+- Instead of `/infinite-echoes/style.css` ✅
+
+#### Solution: Asset Path Handling
+
+The Caddy configuration automatically handles this by:
+
+1. **Main app routing**: Strips prefix for HTML pages
+   ```
+   /infinite-echoes/ → / (nginx receives correct path)
+   ```
+
+2. **Asset routing**: Catches absolute asset requests with referer detection
+   ```
+   /game_bg.wasm + Referer: infinite-echoes → forwards to nginx
+   ```
+
+#### Caddy Configuration Pattern
+```caddy
+# Handle main app page
+handle /{{ project.name }}/* {
+    uri strip_prefix /{{ project.name }}
+    reverse_proxy 127.0.0.1:{{ project.port }}
+}
+handle /{{ project.name }} {
+    redir /{{ project.name }}/ permanent
+}
+
+# Handle any absolute paths from this project (based on referer)
+@{{ project.name }}_assets {
+    header Referer *{{ project.name }}*
+    not path /{{ project.name }}/*
+}
+handle @{{ project.name }}_assets {
+    reverse_proxy 127.0.0.1:{{ project.port }}
+}
+```
+
+### Best Practices
+
+#### For Static Sites with Absolute Paths
+- Use the current configuration (works automatically)
+- No changes needed in your application code
+- Assets are served correctly via referer-based routing
+
+#### For New Applications
+Consider building with relative paths for better portability:
+```html
+<link rel="stylesheet" href="./style.css">
+<script src="./game.js"></script>
+```
+
+#### For Complex SPAs
+Consider using dedicated subdomains instead:
+```yaml
+projects:
+  - name: complex-app
+    subdomain: "app"  # Serves at app.domain.com instead of projects.domain.com/app
+```
+
+### Asset Handling Strategy
+
+The configuration uses **referer-based routing** to automatically handle any absolute path request that comes from your project pages:
+
+- **Automatic**: Works with any file type or path structure
+- **Smart detection**: Uses HTTP referer header to identify requests from your app
+- **No configuration needed**: Handles unknown asset types without manual setup
+
+This means your project can use absolute paths (`/any-file.extension`) and they'll be routed correctly without requiring specific file type configuration.
+
 ## Troubleshooting
 
 ### Check Project Status

@@ -7,5 +7,6 @@
     - { role: security, tags: ['security'] }
     - { role: docker, tags: ['docker'] }
     - { role: authelia, tags: ['authelia'] }
+    - { role: projects, tags: ['projects'] }
     - { role: caddy, tags: ['caddy'] }
     - { role: monitoring, tags: ['monitoring'] }

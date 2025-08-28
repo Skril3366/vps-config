@@ -87,3 +87,4 @@ docker_packages:
 security_packages:
   - fail2ban
   - unattended-upgrades
+

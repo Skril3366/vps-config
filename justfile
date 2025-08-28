@@ -106,9 +106,9 @@ reset-authelia-bans:
     @echo "✅ Authelia bans cleared and service restarted"
 
 # SSH to VPS
-ssh:
-    @echo "🔐 Connecting to VPS..."
-    cd ansible && ansible vps -i inventories/production.yml -m shell -a "uptime"
+ssh command="uptime":
+    @echo "🔐 Running command on VPS: {{command}}"
+    cd ansible && ansible vps -i inventories/production.yml -m shell -a "{{command}}"
 
 @authelia-hash password:
   docker run --rm authelia/authelia:latest authelia crypto hash generate --password '{{password}}'

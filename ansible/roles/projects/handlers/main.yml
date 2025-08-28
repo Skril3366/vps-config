@@ -1,0 +1,7 @@
+---
+- name: restart project containers
+  docker_container:
+    name: "{{ item.name }}"
+    restart: yes
+  loop: "{{ projects }}"
+  when: projects is defined and projects | length > 0

@@ -99,3 +99,15 @@ all:
     security_packages:
       - fail2ban
       - unattended-upgrades
+
+    # Deployment user configuration
+    deployment_user: "deployer"
+    deployment_user_ssh_key: "{{ lookup('file', '~/.ssh/vps-deploy.pub') }}"
+
+    # Projects configuration
+    projects:
+      - name: infinite-echoes
+        type: static
+        port: 8001
+        auth_required: false
+        subdomain: "infinite-echoes"  # Use dedicated subdomain

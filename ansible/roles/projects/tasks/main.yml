@@ -1,0 +1,29 @@
+---
+- name: Create projects base directory
+  file:
+    path: "{{ projects_base_directory }}"
+    state: directory
+    mode: '0755'
+
+- name: Check if project images exist locally
+  docker_image_info:
+    name: "{{ item.name }}:latest"
+  register: project_images
+  loop: "{{ projects }}"
+  when: projects is defined and projects | length > 0
+  failed_when: false
+
+- name: Deploy project containers (only if image exists)
+  docker_container:
+    name: "{{ item.item.name }}"
+    image: "{{ item.item.name }}:latest"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ item.item.port }}:80"
+    env: "{{ item.item.environment | default({}) }}"
+    volumes: "{{ item.item.volumes | default([]) }}"
+  loop: "{{ project_images.results }}"
+  when: 
+    - project_images is defined
+    - item.images | length > 0
